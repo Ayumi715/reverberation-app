@@ -8,6 +8,8 @@
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview"
+
+    "deploy": "gh-pages -d dist",
   },
   "dependencies": {
     "firebase": "^12.19.0",
