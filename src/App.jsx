@@ -3,6 +3,8 @@ import { db } from './firebase';
 import { collection, addDoc } from 'firebase/firestore';
 
 const getTimestamp = () => new Date().toISOString();
+const prefectures = ['北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県', '茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県', '新潟県', '富山県', '石川県', '福井県', '山梨県', '長野県', '岐阜県', '静岡県', '愛知県', '三重県', '滋賀県', '京都府', '大阪府', '兵庫県', '奈良県', '和歌山県', '鳥取県', '島根県', '岡山県', '広島県', '山口県', '徳島県', '香川県', '愛媛県', '高知県', '福岡県', '佐賀県', '長崎県', '熊本県', '大分県', '宮崎県', '鹿児島県', '沖縄県'];
+const roomUsages = ['保育室', '休憩室', '多目的室', '図書室', '音楽室', 'その他'];
 
 export default function App() {
   const [page, setPage] = useState(1);
@@ -125,12 +127,33 @@ export default function App() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <h2>測定情報の入力（※は必須項目）</h2>
           <input placeholder="※施設名を入力" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
-          <input placeholder="県" value={form.pref} onChange={e => setForm({...form, pref: e.target.value})} />
+
+          <label>
+            県
+            <select value={form.pref} onChange={e => setForm({...form, pref: e.target.value})} style={{ width: '100%', marginTop: '6px', marginBottom: '10px', padding: '10px' }}>
+              <option value="">選択してください</option>
+              {prefectures.map((pref) => (
+                <option key={pref} value={pref}>{pref}</option>
+              ))}
+            </select>
+          </label>
+
           <input placeholder="市町村" value={form.city} onChange={e => setForm({...form, city: e.target.value})} />
+
+          <label>
+            部屋の用途
+            <select value={form.usage} onChange={e => setForm({...form, usage: e.target.value})} style={{ width: '100%', marginTop: '6px', marginBottom: '10px', padding: '10px' }}>
+              <option value="">選択してください</option>
+              {roomUsages.map((usage) => (
+                <option key={usage} value={usage}>{usage}</option>
+              ))}
+            </select>
+          </label>
           
           <h3>※部屋の寸法（数値を入力）</h3>
           <label>奥行 (m): <input type="number" value={form.l || ''} onChange={e => setForm({...form, l: Number(e.target.value)})} /></label>
-          <label>幅 (m): <input type="number" value={form.w || ''} onChange={e => setForm({...form, w: Number(e.target.value)})} /></label>
+          <label>幅 (m): <input type="number"
+           value={form.w || ''} onChange={e => setForm({...form, w: Number(e.target.value)})} /></label>
           <label>高さ (m): <input type="number" value={form.h || ''} onChange={e => setForm({...form, h: Number(e.target.value)})} /></label>
 
           {/* 簡易間取り図 */}
