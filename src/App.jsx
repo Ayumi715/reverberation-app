@@ -84,9 +84,13 @@ export default function App() {
 
   // 統一ワンクリックボタンのボタンスタイル
   const headerButtonStyle = {
+    width: '96px',
+    height: '36px',
+    boxSizing: 'border-box',
+    whiteSpace: 'nowrap',
     fontSize: '14px',
     fontWeight: 'bold',
-    padding: '8px 16px',
+    padding: '8px',
     background: '#ffffff',
     color: '#333333',
     border: '1px solid #ced4da',
@@ -97,9 +101,9 @@ export default function App() {
   };
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'sans-serif', maxWidth: '500px', margin: '0 auto' }}>
+    <div style={{ width: '100%', boxSizing: 'border-box', padding: '20px', fontFamily: 'sans-serif', margin: '0 auto' }}>
       
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '96px 96px', justifyContent: 'space-between', width: '100%', marginBottom: '20px' }}>
         <button onClick={() => setPage(1)} style={headerButtonStyle}>
           🏠 ホーム
         </button>
@@ -127,8 +131,8 @@ export default function App() {
       {page === 1 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <h1>保育士向け残響測定</h1>
-          <button style={{ padding: '20px', fontSize: '18px' }} onClick={() => setPage(2)}>🔊 測定を始める</button>
-          <button style={{ padding: '20px', fontSize: '18px' }} onClick={() => alert('今までの結果（実装予定）')}>📁 今までの結果</button>
+          <button style={{ width: '100%', boxSizing: 'border-box', padding: '20px', fontSize: '18px' }} onClick={() => setPage(2)}>🔊 測定を始める</button>
+          <button style={{ width: '100%', boxSizing: 'border-box', padding: '20px', fontSize: '18px' }} onClick={() => alert('今までの結果（実装予定）')}>📁 今までの結果</button>
         </div>
       )}
 
@@ -276,11 +280,11 @@ export default function App() {
 
       {/* ナビゲーションボタン */}
       {page > 1 && page !== 0 && (
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: page === 3 ? '40px' : '16px' }}>
-          <button style={{ padding: '10px 20px', fontSize: '16px' }} onClick={() => setPage(page - 1)}>◀ 戻る</button>
+        <div style={{ display: 'grid', gridTemplateColumns: page < 7 ? 'repeat(2, minmax(0, 1fr))' : '1fr', gap: '12px', marginTop: page === 3 ? '40px' : '16px' }}>
+          <button style={{ width: '100%', boxSizing: 'border-box', padding: '10px 20px', fontSize: '16px' }} onClick={() => setPage(page - 1)}>◀ 戻る</button>
           {page < 7 && (
             <button 
-              style={{ padding: '10px 20px', fontSize: '16px' }} 
+              style={{ width: '100%', boxSizing: 'border-box', padding: '10px 20px', fontSize: '16px' }} 
               onClick={() => setPage(page + 1)}
               disabled={isNextDisabled}
             >
