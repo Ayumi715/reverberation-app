@@ -49,6 +49,17 @@ export default function App() {
     if (num === 6) return [{ x: 0.25, y: 0.25 }, { x: 0.5, y: 0.25 }, { x: 0.75, y: 0.25 }, { x: 0.25, y: 0.75 }, { x: 0.5, y: 0.75 }, { x: 0.75, y: 0.75 }];
     return [];
   };
+  const formatDistance = (distance) => Number(distance.toFixed(2)).toString();
+  const fillTestData = () => setForm((current) => ({
+    ...current,
+    name: 'テスト保育園',
+    pref: '千葉県',
+    city: '習志野市',
+    usage: '保育室',
+    l: 5,
+    w: 7,
+    h: 3,
+  }));
 
   const handleUpload = async () => {
     if (!db) {
@@ -152,6 +163,9 @@ export default function App() {
       {page === 3 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <h2 style={{ margin: '0', fontSize: '24px', fontWeight: '700', textAlign: 'left', color: '#1f2937' }}>施設・部屋の情報</h2>
+          <button type="button" onClick={fillTestData} style={{ width: '100%', boxSizing: 'border-box', padding: '10px', border: '1px solid #9ca3af', borderRadius: '8px', background: '#f3f4f6', color: '#111827', fontSize: '16px', fontWeight: '600', cursor: 'pointer' }}>
+            テスト情報を入力
+          </button>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', color: '#111827', fontSize: '18px', fontWeight: '700', textAlign: 'left' }}>
             <span>施設</span>
@@ -259,14 +273,23 @@ export default function App() {
             <div>
               <h4 style={{ margin: '0 0 8px', textAlign: 'left' }}>測定ポイント配置図</h4>
               <svg viewBox="0 0 320 260" style={{ width: '100%', height: 'auto', display: 'block' }}>
+                <text x={planX + planWidth / 2} y={planY - 10} textAnchor="middle" fontSize="13" fontWeight="700" fill="#111827">幅 {formatDistance(form.w)}m</text>
+                <text x={planX - 10} y={planY + planHeight / 2} textAnchor="middle" fontSize="13" fontWeight="700" fill="#111827" transform={`rotate(-90 ${planX - 10} ${planY + planHeight / 2})`}>奥行 {formatDistance(form.l)}m</text>
                 <rect x={planX} y={planY} width={planWidth} height={planHeight} fill="#dbeafe" stroke="#2563eb" strokeWidth="2" />
                 {getPointCoords(numPoints).map((pt, index) => {
                   const ptX = planX + pt.x * planWidth;
                   const ptY = planY + pt.y * planHeight;
+                  const fromLeft = pt.x * form.w;
+                  const fromTop = pt.y * form.l;
+                  const distanceLabelY = pt.y >= 0.7 ? ptY - 16 : ptY + 17;
                   return (
                     <g key={index}>
                       <circle cx={ptX} cy={ptY} r="8" fill="#ff1744" stroke="#fff" strokeWidth="1.5" />
                       <text x={ptX} y={ptY + 4} textAnchor="middle" fontSize="10" fill="#fff" fontWeight="bold">{index + 1}</text>
+                      <text x={ptX} y={distanceLabelY} textAnchor="middle" fontSize="9" fill="#111827" fontWeight="700">
+                        <tspan x={ptX} dy="0">左 {formatDistance(fromLeft)}m</tspan>
+                        <tspan x={ptX} dy="10">上 {formatDistance(fromTop)}m</tspan>
+                      </text>
                     </g>
                   );
                 })}
