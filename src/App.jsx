@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { db } from './firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, limit, orderBy, query } from 'firebase/firestore';
 
 const getTimestamp = () => new Date().toISOString();
 const prefectures = ['北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県', '茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県', '新潟県', '富山県', '石川県', '福井県', '山梨県', '長野県', '岐阜県', '静岡県', '愛知県', '三重県', '滋賀県', '京都府', '大阪府', '兵庫県', '奈良県', '和歌山県', '鳥取県', '島根県', '岡山県', '広島県', '山口県', '徳島県', '香川県', '愛媛県', '高知県', '福岡県', '佐賀県', '長崎県', '熊本県', '大分県', '宮崎県', '鹿児島県', '沖縄県'];
@@ -19,6 +19,9 @@ export default function App() {
   const [prevPage, setPrevPage] = useState(1); // 直前のページ一時記録
   const [form, setForm] = useState({ name: '', pref: '', city: '', kids: '', usage: '', l: 0, w: 0, h: 0 });
   const [checklist, setChecklist] = useState(() => checklistItems.map(() => false));
+  const [savedResults, setSavedResults] = useState([]);
+  const [resultsLoading, setResultsLoading] = useState(false);
+  const [resultsError, setResultsError] = useState('');
 
   const V = form.l * form.w * form.h; // 室容積
   const dc = 0.057 * Math.sqrt(V / 0.5); // 直接音距離
@@ -60,6 +63,36 @@ export default function App() {
     w: 7,
     h: 3,
   }));
+  const handleRetrySamePlace = () => {
+    setChecklist(checklistItems.map(() => false));
+    setPage(4);
+  };
+  const handleMeasureDifferentPlace = () => {
+    setForm({ name: '', pref: '', city: '', kids: '', usage: '', l: 0, w: 0, h: 0 });
+    setChecklist(checklistItems.map(() => false));
+    setPage(3);
+  };
+
+  const handleShowSavedResults = async () => {
+    setPage(8);
+    setResultsError('');
+    if (!db) {
+      setResultsError('Firebase の設定が未完了です。');
+      return;
+    }
+
+    setResultsLoading(true);
+    try {
+      const resultsQuery = query(collection(db, 'measurements'), orderBy('date', 'desc'), limit(50));
+      const snapshot = await getDocs(resultsQuery);
+      setSavedResults(snapshot.docs.map((document) => ({ ...document.data(), id: document.id })));
+    } catch (error) {
+      console.error('測定結果の読み込みに失敗しました:', error);
+      setResultsError('結果を読み込めませんでした。Firestore の読み取り権限を確認してください。');
+    } finally {
+      setResultsLoading(false);
+    }
+  };
 
   const handleUpload = async () => {
     if (!db) {
@@ -73,6 +106,9 @@ export default function App() {
         location: `${form.pref} ${form.city}`,
         kids: form.kids,
         usage: form.usage,
+        depth: form.l,
+        width: form.w,
+        height: form.h,
         volume: V,
         dc: dc,
         points: numPoints,
@@ -141,7 +177,7 @@ export default function App() {
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '12px', minHeight: 'calc(100svh - 96px)', textAlign: 'center' }}>
           <h1>保育士向け残響測定</h1>
           <button style={{ width: '100%', boxSizing: 'border-box', padding: '20px', fontSize: '18px' }} onClick={() => setPage(2)}>🔊 測定を始める</button>
-          <button style={{ width: '100%', boxSizing: 'border-box', padding: '20px', fontSize: '18px' }} onClick={() => alert('今までの結果（実装予定）')}>📁 今までの結果</button>
+          <button style={{ width: '100%', boxSizing: 'border-box', padding: '20px', fontSize: '18px' }} onClick={handleShowSavedResults}>📁 今までの結果</button>
         </div>
       )}
 
@@ -314,13 +350,47 @@ export default function App() {
           <button style={{ padding: '15px 30px', fontSize: '18px', width: '100%', background: '#ff9900', color: 'white', border: 'none', borderRadius: '5px' }} onClick={handleUpload}>
             💾 結果をアップロードする
           </button>
+          <button style={{ width: '100%', boxSizing: 'border-box', padding: '12px', fontSize: '16px' }} onClick={handleRetrySamePlace}>
+            同じ場所で測定をやり直す
+          </button>
+          <button style={{ width: '100%', boxSizing: 'border-box', padding: '12px', fontSize: '16px' }} onClick={handleMeasureDifferentPlace}>
+            別の場所で測定をする
+          </button>
+          <button style={{ width: '100%', boxSizing: 'border-box', padding: '12px', fontSize: '16px' }} onClick={() => setPage(1)}>
+            🏠 ホームに戻る
+          </button>
+        </div>
+      )}
+
+      {page === 8 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', textAlign: 'left' }}>
+          <h2>保存済みの測定結果</h2>
+          {resultsLoading ? (
+            <p>結果を読み込んでいます...</p>
+          ) : resultsError ? (
+            <p role="alert" style={{ color: '#b91c1c' }}>{resultsError}</p>
+          ) : savedResults.length === 0 ? (
+            <p>保存済みの結果はありません。</p>
+          ) : (
+            <ul style={{ display: 'flex', flexDirection: 'column', gap: '16px', margin: '0', padding: '0', listStyle: 'none' }}>
+              {savedResults.map((result) => (
+                <li key={result.id} style={{ paddingBottom: '12px', borderBottom: '1px solid #d1d5db' }}>
+                  <h3 style={{ margin: '0 0 4px', fontSize: '18px', color: '#111827' }}>{result.facilityName || '施設名未登録'}</h3>
+                  <p>{result.location || '所在地未登録'} / {result.usage || '用途未登録'}</p>
+                  <p>奥行 {result.depth ?? '未記録'}m × 幅 {result.width ?? '未記録'}m × 高さ {result.height ?? '未記録'}m</p>
+                  <p>室容積 {result.volume ?? '未記録'}m³ / 推奨測定点数 {result.points ?? '未記録'}点</p>
+                  <p>{result.date ? new Date(result.date).toLocaleString('ja-JP') : '日時不明'}</p>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
 
       {/* ナビゲーションボタン */}
-      {page > 1 && page !== 0 && (
+      {page > 1 && page !== 0 && page !== 7 && (
         <div style={{ display: 'grid', gridTemplateColumns: page < 7 ? 'repeat(2, minmax(0, 1fr))' : '1fr', gap: '12px', marginTop: page === 3 ? '40px' : '16px' }}>
-          <button style={{ width: '100%', boxSizing: 'border-box', padding: '10px 20px', fontSize: '16px' }} onClick={() => setPage(page - 1)}>◀ 戻る</button>
+          <button style={{ width: '100%', boxSizing: 'border-box', padding: '10px 20px', fontSize: '16px' }} onClick={() => setPage(page === 8 ? 1 : page - 1)}>{page === 8 ? '🏠 ホームに戻る' : '◀ 戻る'}</button>
           {page < 7 && (
             <button 
               style={{ width: '100%', boxSizing: 'border-box', padding: '10px 20px', fontSize: '16px' }} 
