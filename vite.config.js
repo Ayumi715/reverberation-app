@@ -9,4 +9,5 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   base: '/reverberation-app/',
   plugins: [react()],
+  base: '/reverberation-app/',
 })
