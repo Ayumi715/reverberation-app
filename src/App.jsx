@@ -4,7 +4,19 @@ import { collection, addDoc } from 'firebase/firestore';
 
 const getTimestamp = () => new Date().toISOString();
 const prefectures = ['北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県', '茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県', '新潟県', '富山県', '石川県', '福井県', '山梨県', '長野県', '岐阜県', '静岡県', '愛知県', '三重県', '滋賀県', '京都府', '大阪府', '兵庫県', '奈良県', '和歌山県', '鳥取県', '島根県', '岡山県', '広島県', '山口県', '徳島県', '香川県', '愛媛県', '高知県', '福岡県', '佐賀県', '長崎県', '熊本県', '大分県', '宮崎県', '鹿児島県', '沖縄県'];
-const roomUsages = ['保育室', '休憩室', '多目的室', '図書室', '音楽室', 'その他'];
+const roomUsages = [
+  '保育室',
+  '休憩室',
+  '多目的室',
+  '図書室',
+  '音楽室',
+  '乳児室',
+  'ほふく室',
+  '遊戯室（ホール）',
+  '調理室',
+  '職員室',
+  'その他',
+];
 
 export default function App() {
   const [page, setPage] = useState(1);
@@ -124,25 +136,34 @@ export default function App() {
 
       {/* P3: 測定に必要な情報入力 */}
       {page === 3 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <h2>測定情報の入力（※は必須項目）</h2>
-          <input placeholder="※施設名を入力" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <h2 style={{ margin: '0', fontSize: '24px', fontWeight: '700', textAlign: 'left', color: '#1f2937' }}>施設・部屋の情報</h2>
 
-          <label>
-            県
-            <select value={form.pref} onChange={e => setForm({...form, pref: e.target.value})} style={{ width: '100%', marginTop: '6px', marginBottom: '10px', padding: '10px' }}>
-              <option value="">選択してください</option>
-              {prefectures.map((pref) => (
-                <option key={pref} value={pref}>{pref}</option>
-              ))}
-            </select>
+          <label style={{ display: 'flex', flexDirection: 'column', fontSize: '16px', fontWeight: '600', gap: '6px', color: '#374151', textAlign: 'left' }}>
+            <span>施設名</span>
+            <input placeholder="※施設名を入力" value={form.name} onChange={e => setForm({...form, name: e.target.value})} style={{ width: '100%', boxSizing: 'border-box', padding: '10px', fontSize: '16px', color: '#374151', textAlign: 'left' }} />
           </label>
 
-          <input placeholder="市町村" value={form.city} onChange={e => setForm({...form, city: e.target.value})} />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '12px' }}>
+            <label style={{ display: 'flex', flexDirection: 'column', fontSize: '16px', fontWeight: '600', gap: '6px', color: '#374151', textAlign: 'left' }}>
+              <span>県</span>
+              <select value={form.pref} onChange={e => setForm({...form, pref: e.target.value})} style={{ width: '100%', padding: '10px', boxSizing: 'border-box', fontSize: '16px', color: '#374151', textAlign: 'left' }}>
+                <option value="">選択してください</option>
+                {prefectures.map((pref) => (
+                  <option key={pref} value={pref}>{pref}</option>
+                ))}
+              </select>
+            </label>
 
-          <label>
-            部屋の用途
-            <select value={form.usage} onChange={e => setForm({...form, usage: e.target.value})} style={{ width: '100%', marginTop: '6px', marginBottom: '10px', padding: '10px' }}>
+            <label style={{ display: 'flex', flexDirection: 'column', fontSize: '16px', fontWeight: '600', gap: '6px', color: '#374151', textAlign: 'left' }}>
+              <span>市町村</span>
+              <input placeholder="市町村" value={form.city} onChange={e => setForm({...form, city: e.target.value})} style={{ width: '100%', boxSizing: 'border-box', padding: '10px', fontSize: '16px', color: '#374151', textAlign: 'left' }} />
+            </label>
+          </div>
+
+          <label style={{ display: 'flex', flexDirection: 'column', fontSize: '16px', fontWeight: '600', gap: '6px', color: '#374151', textAlign: 'left' }}>
+            <span>部屋の用途</span>
+            <select value={form.usage} onChange={e => setForm({...form, usage: e.target.value})} style={{ width: '100%', padding: '10px', boxSizing: 'border-box', fontSize: '16px', color: '#374151', textAlign: 'left' }}>
               <option value="">選択してください</option>
               {roomUsages.map((usage) => (
                 <option key={usage} value={usage}>{usage}</option>
@@ -150,19 +171,38 @@ export default function App() {
             </select>
           </label>
           
-          <h3>※部屋の寸法（数値を入力）</h3>
-          <label>奥行 (m): <input type="number" value={form.l || ''} onChange={e => setForm({...form, l: Number(e.target.value)})} /></label>
-          <label>幅 (m): <input type="number"
-           value={form.w || ''} onChange={e => setForm({...form, w: Number(e.target.value)})} /></label>
-          <label>高さ (m): <input type="number" value={form.h || ''} onChange={e => setForm({...form, h: Number(e.target.value)})} /></label>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '12px' }}>
+            <label style={{ display: 'flex', flexDirection: 'column', fontSize: '16px', fontWeight: '600', gap: '6px', color: '#374151', textAlign: 'left' }}>
+              <span>奥行 (m)</span>
+              <input type="number" value={form.l || ''} onChange={e => setForm({...form, l: Number(e.target.value)})} style={{ width: '100%', boxSizing: 'border-box', padding: '10px', fontSize: '16px', color: '#374151', textAlign: 'left' }} />
+            </label>
+            <label style={{ display: 'flex', flexDirection: 'column', fontSize: '16px', fontWeight: '600', gap: '6px', color: '#374151', textAlign: 'left' }}>
+              <span>幅 (m)</span>
+              <input type="number" value={form.w || ''} onChange={e => setForm({...form, w: Number(e.target.value)})} style={{ width: '100%', boxSizing: 'border-box', padding: '10px', fontSize: '16px', color: '#374151', textAlign: 'left' }} />
+            </label>
+            <label style={{ display: 'flex', flexDirection: 'column', fontSize: '16px', fontWeight: '600', gap: '6px', color: '#374151', textAlign: 'left' }}>
+              <span>高さ (m)</span>
+              <input type="number" value={form.h || ''} onChange={e => setForm({...form, h: Number(e.target.value)})} style={{ width: '100%', boxSizing: 'border-box', padding: '10px', fontSize: '16px', color: '#374151', textAlign: 'left' }} />
+            </label>
+          </div>
 
           {/* 簡易間取り図 */}
           {form.l > 0 && form.w > 0 && (
             <div style={{ marginTop: '20px', textAlign: 'center', background: '#f5f5f5', padding: '15px', borderRadius: '8px' }}>
-              <h4>簡易間取り図</h4>
-              <svg width="200" height="200" style={{ border: '1px solid #ccc', background: '#fff' }}>
+              <div style={{ marginBottom: '12px', fontSize: '16px', fontWeight: '600', color: '#374151', textAlign: 'left' }}>簡易間取り図</div>
+              <svg width="220" height="220" viewBox="0 0 220 220" style={{ border: '1px solid #ccc', background: '#fff', display: 'block', margin: '0 auto' }}>
                 <rect x={rectX} y={rectY} width={svgW} height={svgL} fill="#e0f7fa" stroke="#00acc1" strokeWidth="2" />
-                <text x="100" y="105" textAnchor="middle" fontSize="12" fill="#006064">{form.w}m × {form.l}m</text>
+                {[...Array(Math.max(1, Math.ceil(Math.max(form.l, form.w))))].map((_, index) => {
+                  const offset = index + 1;
+                  const x = 10 + offset * 18;
+                  const y = 10 + offset * 18;
+                  return (
+                    <g key={index}>
+                      <line x1={x} y1="10" x2={x} y2="210" stroke="#d1d5db" strokeWidth="1" />
+                      <line x1="10" y1={y} x2="210" y2={y} stroke="#d1d5db" strokeWidth="1" />
+                    </g>
+                  );
+                })}
               </svg>
             </div>
           )}
