@@ -149,7 +149,7 @@ export default function App() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <h2 style={{ margin: '0', fontSize: '24px', fontWeight: '700', textAlign: 'left', color: '#1f2937' }}>施設・部屋の情報</h2>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', color: '#111827', fontSize: '14px', fontWeight: '700', textAlign: 'left' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', color: '#111827', fontSize: '18px', fontWeight: '700', textAlign: 'left' }}>
             <span>施設</span>
             <span style={{ color: '#111827', fontSize: '16px', fontWeight: '700' }}>施設名</span>
           </div>
@@ -172,7 +172,7 @@ export default function App() {
             </label>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', color: '#111827', fontSize: '14px', fontWeight: '700', textAlign: 'left' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '16px', color: '#111827', fontSize: '18px', fontWeight: '700', textAlign: 'left' }}>
             <span>部屋</span>
             <span style={{ color: '#111827', fontSize: '16px', fontWeight: '700' }}>部屋の用途</span>
           </div>
