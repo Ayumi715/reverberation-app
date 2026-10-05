@@ -138,9 +138,15 @@ export default function App() {
 
       {/* P2: 測定概要 */}
       {page === 2 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <h2>測定概要</h2>
-          <p>（測定の概要。現在内容調整中。）</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', textAlign: 'left', lineHeight: '1.6' }}>
+          <h2>当アプリの概要</h2>
+          <p>このアプリは保育施設における残響時間を測定することによって、全国の保育施設の音環境をより良くしていくことを目的に開発されました。以下の手順で進んでいきます。</p>
+          <ol style={{ margin: '0', paddingLeft: '24px' }}>
+            <li><strong>準備:</strong> 施設名を含む基本情報の入力、また部屋の寸法を入力します。その後、チェックリストや指示に沿って正確な測定に向けた準備を行います。</li>
+            <li><strong>測定:</strong> アプリから音を鳴らして、部屋の響きを記録します。測定中はできるだけ静かにしてください。</li>
+            <li><strong>結果表示:</strong> 残響時間が表示され、データをアップロードすることによって結果が保存されます。その他、測定をやり直すことや別の場所で測定を行うことも出来ます。</li>
+          </ol>
+          <p>内容を確認したら「次へ」を押してください。</p>
         </div>
       )}
 
