@@ -39,6 +39,12 @@ export default function App() {
   const rectX = 100 - svgW / 2;
   const rectY = 100 - svgL / 2;
 
+  const planScale = 210 / Math.max(form.l, form.w || 1);
+  const planWidth = form.w > 0 ? form.w * planScale : 0;
+  const planHeight = form.l > 0 ? form.l * planScale : 0;
+  const planX = form.w > 0 ? (320 - planWidth) / 2 : 0;
+  const planY = form.l > 0 ? (260 - planHeight) / 2 : 0;
+
   const getPointCoords = (num) => {
     if (num === 3) return [{ x: 0.25, y: 0.5 }, { x: 0.5, y: 0.5 }, { x: 0.75, y: 0.5 }];
     if (num === 5) return [{ x: 0.25, y: 0.25 }, { x: 0.75, y: 0.25 }, { x: 0.5, y: 0.5 }, { x: 0.25, y: 0.75 }, { x: 0.75, y: 0.75 }];
@@ -91,27 +97,27 @@ export default function App() {
   };
 
   return (
-    <div style={{ padding: '70px 20px 20px', fontFamily: 'sans-serif', maxWidth: '500px', margin: '0 auto' }}>
+    <div style={{ padding: '20px', fontFamily: 'sans-serif', maxWidth: '500px', margin: '0 auto' }}>
       
-      <div style={{ position: 'fixed', top: '12px', left: '12px', right: '12px', zIndex: 1000, display: 'flex', justifyContent: 'space-between', pointerEvents: 'none' }}>
-        <button onClick={() => setPage(1)} style={{ ...headerButtonStyle, pointerEvents: 'auto' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+        <button onClick={() => setPage(1)} style={headerButtonStyle}>
           🏠 ホーム
         </button>
-        <button onClick={handleHelpClick} style={{ ...headerButtonStyle, pointerEvents: 'auto' }}>
+        <button onClick={handleHelpClick} style={headerButtonStyle}>
           ❓ ヘルプ
         </button>
       </div>
 
       {/* P0: アプリの説明（ヘルプ画面） */}
       {page === 0 && (
-        <div style={{ lineHeight: '1.6' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', lineHeight: '1.6' }}>
           <h2>💡 アプリの説明（ヘルプ）</h2>
           <p>このアプリケーションは、保育施設における最適な音環境（残響時間）を整えるため、室容積や最適な測定ポイントを算出・ガイドする測定支援ツールです。</p>
-          <ul>
+          <ul style={{ margin: '0', paddingLeft: '20px' }}>
             <li><strong>自動算出:</strong> 部屋の寸法を入力するだけで室容積、推奨測定点数、直接音距離を瞬時に計算します。</li>
             <li><strong>ガイド機能:</strong> 室容積に合わせた最適なマッピング図を画面上に自動で描画します。</li>
           </ul>
-          <button onClick={() => setPage(prevPage)} style={{ marginTop: '20px', padding: '10px 20px', fontSize: '16px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer', width: '100%' }}>
+          <button onClick={() => setPage(prevPage)} style={{ padding: '10px 20px', fontSize: '16px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer', width: '100%' }}>
             元の画面に戻る
           </button>
         </div>
@@ -119,7 +125,7 @@ export default function App() {
 
       {/* P1: ホーム画面 */}
       {page === 1 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '40px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <h1>保育士向け残響測定</h1>
           <button style={{ padding: '20px', fontSize: '18px' }} onClick={() => setPage(2)}>🔊 測定を始める</button>
           <button style={{ padding: '20px', fontSize: '18px' }} onClick={() => alert('今までの結果（実装予定）')}>📁 今までの結果</button>
@@ -128,7 +134,7 @@ export default function App() {
 
       {/* P2: 測定概要 */}
       {page === 2 && (
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <h2>測定概要</h2>
           <p>（測定の概要。現在内容調整中。）</p>
         </div>
@@ -139,15 +145,16 @@ export default function App() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <h2 style={{ margin: '0', fontSize: '24px', fontWeight: '700', textAlign: 'left', color: '#1f2937' }}>施設・部屋の情報</h2>
 
-          <label style={{ display: 'flex', flexDirection: 'column', fontSize: '16px', fontWeight: '600', gap: '6px', color: '#374151', textAlign: 'left' }}>
-            <span>施設名</span>
-            <input placeholder="※施設名を入力" value={form.name} onChange={e => setForm({...form, name: e.target.value})} style={{ width: '100%', boxSizing: 'border-box', padding: '10px', fontSize: '16px', color: '#374151', textAlign: 'left' }} />
-          </label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', color: '#111827', fontSize: '14px', fontWeight: '700', textAlign: 'left' }}>
+            <span>施設</span>
+            <span style={{ color: '#111827', fontSize: '16px', fontWeight: '700' }}>施設名</span>
+          </div>
+          <input placeholder="※施設名を入力" value={form.name} onChange={e => setForm({...form, name: e.target.value})} style={{ width: '100%', boxSizing: 'border-box', padding: '10px', fontSize: '16px', color: '#374151', textAlign: 'left', border: '1px solid #d1d5db', borderRadius: '8px' }} />
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '12px' }}>
             <label style={{ display: 'flex', flexDirection: 'column', fontSize: '16px', fontWeight: '600', gap: '6px', color: '#374151', textAlign: 'left' }}>
               <span>県</span>
-              <select value={form.pref} onChange={e => setForm({...form, pref: e.target.value})} style={{ width: '100%', padding: '10px', boxSizing: 'border-box', fontSize: '16px', color: '#374151', textAlign: 'left' }}>
+              <select value={form.pref} onChange={e => setForm({...form, pref: e.target.value})} style={{ width: '100%', padding: '10px', boxSizing: 'border-box', fontSize: '16px', color: '#374151', textAlign: 'left', border: '1px solid #d1d5db', borderRadius: '8px' }}>
                 <option value="">選択してください</option>
                 {prefectures.map((pref) => (
                   <option key={pref} value={pref}>{pref}</option>
@@ -157,64 +164,66 @@ export default function App() {
 
             <label style={{ display: 'flex', flexDirection: 'column', fontSize: '16px', fontWeight: '600', gap: '6px', color: '#374151', textAlign: 'left' }}>
               <span>市町村</span>
-              <input placeholder="市町村" value={form.city} onChange={e => setForm({...form, city: e.target.value})} style={{ width: '100%', boxSizing: 'border-box', padding: '10px', fontSize: '16px', color: '#374151', textAlign: 'left' }} />
+              <input placeholder="市町村" value={form.city} onChange={e => setForm({...form, city: e.target.value})} style={{ width: '100%', boxSizing: 'border-box', padding: '10px', fontSize: '16px', color: '#374151', textAlign: 'left', border: '1px solid #d1d5db', borderRadius: '8px' }} />
             </label>
           </div>
 
-          <label style={{ display: 'flex', flexDirection: 'column', fontSize: '16px', fontWeight: '600', gap: '6px', color: '#374151', textAlign: 'left' }}>
-            <span>部屋の用途</span>
-            <select value={form.usage} onChange={e => setForm({...form, usage: e.target.value})} style={{ width: '100%', padding: '10px', boxSizing: 'border-box', fontSize: '16px', color: '#374151', textAlign: 'left' }}>
-              <option value="">選択してください</option>
-              {roomUsages.map((usage) => (
-                <option key={usage} value={usage}>{usage}</option>
-              ))}
-            </select>
-          </label>
-          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', color: '#111827', fontSize: '14px', fontWeight: '700', textAlign: 'left' }}>
+            <span>部屋</span>
+            <span style={{ color: '#111827', fontSize: '16px', fontWeight: '700' }}>部屋の用途</span>
+          </div>
+          <select value={form.usage} onChange={e => setForm({...form, usage: e.target.value})} style={{ width: '100%', padding: '10px', boxSizing: 'border-box', fontSize: '16px', color: '#374151', textAlign: 'left', border: '1px solid #d1d5db', borderRadius: '8px' }}>
+            <option value="">選択してください</option>
+            {roomUsages.map((usage) => (
+              <option key={usage} value={usage}>{usage}</option>
+            ))}
+          </select>
+
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '12px' }}>
             <label style={{ display: 'flex', flexDirection: 'column', fontSize: '16px', fontWeight: '600', gap: '6px', color: '#374151', textAlign: 'left' }}>
               <span>奥行 (m)</span>
-              <input type="number" value={form.l || ''} onChange={e => setForm({...form, l: Number(e.target.value)})} style={{ width: '100%', boxSizing: 'border-box', padding: '10px', fontSize: '16px', color: '#374151', textAlign: 'left' }} />
+              <input type="number" value={form.l || ''} onChange={e => setForm({...form, l: Number(e.target.value)})} style={{ width: '100%', boxSizing: 'border-box', padding: '10px', fontSize: '16px', color: '#374151', textAlign: 'left', border: '1px solid #d1d5db', borderRadius: '8px' }} />
             </label>
             <label style={{ display: 'flex', flexDirection: 'column', fontSize: '16px', fontWeight: '600', gap: '6px', color: '#374151', textAlign: 'left' }}>
               <span>幅 (m)</span>
-              <input type="number" value={form.w || ''} onChange={e => setForm({...form, w: Number(e.target.value)})} style={{ width: '100%', boxSizing: 'border-box', padding: '10px', fontSize: '16px', color: '#374151', textAlign: 'left' }} />
+              <input type="number" value={form.w || ''} onChange={e => setForm({...form, w: Number(e.target.value)})} style={{ width: '100%', boxSizing: 'border-box', padding: '10px', fontSize: '16px', color: '#374151', textAlign: 'left', border: '1px solid #d1d5db', borderRadius: '8px' }} />
             </label>
             <label style={{ display: 'flex', flexDirection: 'column', fontSize: '16px', fontWeight: '600', gap: '6px', color: '#374151', textAlign: 'left' }}>
               <span>高さ (m)</span>
-              <input type="number" value={form.h || ''} onChange={e => setForm({...form, h: Number(e.target.value)})} style={{ width: '100%', boxSizing: 'border-box', padding: '10px', fontSize: '16px', color: '#374151', textAlign: 'left' }} />
+              <input type="number" value={form.h || ''} onChange={e => setForm({...form, h: Number(e.target.value)})} style={{ width: '100%', boxSizing: 'border-box', padding: '10px', fontSize: '16px', color: '#374151', textAlign: 'left', border: '1px solid #d1d5db', borderRadius: '8px' }} />
             </label>
           </div>
 
+          {isNextDisabled && <p style={{ color: '#b91c1c', fontSize: '13px', textAlign: 'left' }}>※「施設名」「奥行」「幅」「高さ」をすべて入力すると「次へ」に進めます。</p>}
+
           {/* 簡易間取り図 */}
           {form.l > 0 && form.w > 0 && (
-            <div style={{ marginTop: '20px', textAlign: 'center', background: '#f5f5f5', padding: '15px', borderRadius: '8px' }}>
-              <div style={{ marginBottom: '12px', fontSize: '16px', fontWeight: '600', color: '#374151', textAlign: 'left' }}>簡易間取り図</div>
-              <svg width="220" height="220" viewBox="0 0 220 220" style={{ border: '1px solid #ccc', background: '#fff', display: 'block', margin: '0 auto' }}>
-                <rect x={rectX} y={rectY} width={svgW} height={svgL} fill="#e0f7fa" stroke="#00acc1" strokeWidth="2" />
-                {[...Array(Math.max(1, Math.ceil(Math.max(form.l, form.w))))].map((_, index) => {
-                  const offset = index + 1;
-                  const x = 10 + offset * 18;
-                  const y = 10 + offset * 18;
-                  return (
-                    <g key={index}>
-                      <line x1={x} y1="10" x2={x} y2="210" stroke="#d1d5db" strokeWidth="1" />
-                      <line x1="10" y1={y} x2="210" y2={y} stroke="#d1d5db" strokeWidth="1" />
-                    </g>
-                  );
-                })}
-              </svg>
+            <div style={{ marginTop: '20px' }}>
+              <div className="plan-wrap" style={{ width: '100%', margin: '0 auto' }}>
+                <svg id="plan" viewBox="0 0 320 260" role="img" aria-label="入力した寸法にもとづく部屋の間取り図" style={{ width: '100%', height: 'auto', display: 'block' }}>
+                  <text x={planX + planWidth / 2} y={planY - 10} textAnchor="middle" fontSize="13" fontWeight="700" fill="#111827">幅 {form.w}m</text>
+                  <text x={planX - 10} y={planY + planHeight / 2} textAnchor="middle" fontSize="13" fontWeight="700" fill="#111827" transform={`rotate(-90 ${planX - 10} ${planY + planHeight / 2})`}>奥行 {form.l}m</text>
+                  <rect x={planX} y={planY} width={planWidth} height={planHeight} fill="#dbeafe" stroke="#2563eb" strokeWidth="2" />
+                  {Array.from({ length: Math.ceil(form.w) + 1 }).map((_, index) => {
+                    const x = planX + (index / Math.max(1, Math.ceil(form.w))) * planWidth;
+                    return <line key={`v-${index}`} x1={x} y1={planY} x2={x} y2={planY + planHeight} stroke="#cbd5e1" strokeWidth="1" />;
+                  })}
+                  {Array.from({ length: Math.ceil(form.l) + 1 }).map((_, index) => {
+                    const y = planY + (index / Math.max(1, Math.ceil(form.l))) * planHeight;
+                    return <line key={`h-${index}`} x1={planX} y1={y} x2={planX + planWidth} y2={y} stroke="#cbd5e1" strokeWidth="1" />;
+                  })}
+                </svg>
+              </div>
             </div>
           )}
-          {isNextDisabled && <p style={{ color: 'red', fontSize: '13px' }}>※「施設名」「奥行」「幅」「高さ」をすべて入力すると「次へ」に進めます。</p>}
         </div>
       )}
 
       {/* P4: チェックリスト */}
       {page === 4 && (
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <h2>測定前チェックリスト</h2>
-          <ul>
+          <ul style={{ margin: '0', paddingLeft: '20px' }}>
             <li>窓やドアは全て閉まっていますか？</li>
             <li>部屋の中は静かですか？</li>
           </ul>
@@ -223,17 +232,17 @@ export default function App() {
 
       {/* P5: 測定ガイド */}
       {page === 5 && (
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <h2>測定位置の確認</h2>
           {/* 測定点マッピング */}
           {form.l > 0 && form.w > 0 && (
-            <div style={{ textAlign: 'center', background: '#f5f5f5', padding: '15px', borderRadius: '8px' }}>
-              <h4>測定ポイント配置図</h4>
-              <svg width="200" height="200" style={{ border: '1px solid #ccc', background: '#fff' }}>
-                <rect x={rectX} y={rectY} width={svgW} height={svgL} fill="#e0f7fa" stroke="#00acc1" strokeWidth="2" />
+            <div>
+              <h4 style={{ margin: '0 0 8px', textAlign: 'left' }}>測定ポイント配置図</h4>
+              <svg viewBox="0 0 320 260" style={{ width: '100%', height: 'auto', display: 'block' }}>
+                <rect x={planX} y={planY} width={planWidth} height={planHeight} fill="#dbeafe" stroke="#2563eb" strokeWidth="2" />
                 {getPointCoords(numPoints).map((pt, index) => {
-                  const ptX = rectX + pt.x * svgW;
-                  const ptY = rectY + pt.y * svgL;
+                  const ptX = planX + pt.x * planWidth;
+                  const ptY = planY + pt.y * planHeight;
                   return (
                     <g key={index}>
                       <circle cx={ptX} cy={ptY} r="8" fill="#ff1744" stroke="#fff" strokeWidth="1.5" />
@@ -249,7 +258,7 @@ export default function App() {
 
       {/* P6: 測定開始 */}
       {page === 6 && (
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <h2>測定開始</h2>
           <p>測定を行ってください。</p>
         </div>
@@ -257,7 +266,7 @@ export default function App() {
 
       {/* P7: 結果 */}
       {page === 7 && (
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <h2>測定結果</h2>
           <button style={{ padding: '15px 30px', fontSize: '18px', width: '100%', background: '#ff9900', color: 'white', border: 'none', borderRadius: '5px' }} onClick={handleUpload}>
             💾 結果をアップロードする
@@ -267,7 +276,7 @@ export default function App() {
 
       {/* ナビゲーションボタン */}
       {page > 1 && page !== 0 && (
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '40px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: page === 3 ? '40px' : '16px' }}>
           <button style={{ padding: '10px 20px', fontSize: '16px' }} onClick={() => setPage(page - 1)}>◀ 戻る</button>
           {page < 7 && (
             <button 
