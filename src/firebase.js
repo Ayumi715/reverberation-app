@@ -1,19 +1,16 @@
-// Firebase SDK から必要なモジュールをインポート
-import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { initializeApp, getApps } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
 
-// コピーした設定オブジェクト（プロジェクト ID は自動で紐づきます）
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY", // コンソールで表示された実際のキーに書き換えてください
-  authDomain: "reverberation-60f82.firebaseapp.com",
-  projectId: "reverberation-60f82",
-  storageBucket: "reverberation-60f82.firebasestorage.app",
-  messagingSenderId: "67631437602",
-  appId: "YOUR_APP_ID"  // コンソールで表示された実際のIDに書き換えてください
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'reverberation-60f82.firebaseapp.com',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'reverberation-60f82',
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'reverberation-60f82.firebasestorage.app',
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '67631437602',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || '',
 };
 
-// Firebaseアプリを初期化
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 
-// 他のコンポーネントで使えるように、Firestore インスタンスをエクスポート
-export const db = getFirestore(app);
+export const isFirebaseConfigured = Boolean(firebaseConfig.apiKey && firebaseConfig.appId);
+export const db = isFirebaseConfigured ? getFirestore(app) : null;

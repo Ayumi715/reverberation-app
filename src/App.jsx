@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { db } from './firebase';
 import { collection, addDoc } from 'firebase/firestore';
 
+const getTimestamp = () => new Date().toISOString();
+
 export default function App() {
   const [page, setPage] = useState(1);
   const [prevPage, setPrevPage] = useState(1); // 直前のページ一時記録
@@ -31,8 +33,13 @@ export default function App() {
   };
 
   const handleUpload = async () => {
+    if (!db) {
+      alert('Firebase の設定が未完了です。環境変数 VITE_FIREBASE_API_KEY と VITE_FIREBASE_APP_ID を設定してください。');
+      return;
+    }
+
     try {
-      await addDoc(collection(db, "measurements"), {
+      await addDoc(collection(db, 'measurements'), {
         facilityName: form.name,
         location: `${form.pref} ${form.city}`,
         kids: form.kids,
@@ -40,10 +47,12 @@ export default function App() {
         volume: V,
         dc: dc,
         points: numPoints,
-        date: new Date().toISOString()
+        date: getTimestamp(),
       });
-      alert("データをアップロードしました！");
-    } catch (e) { alert("エラー: " + e.message); }
+      alert('データをアップロードしました！');
+    } catch (e) {
+      alert('エラー: ' + e.message);
+    }
   };
 
   const handleHelpClick = () => {
