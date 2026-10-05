@@ -4,24 +4,21 @@ import { collection, addDoc } from 'firebase/firestore';
 
 const getTimestamp = () => new Date().toISOString();
 const prefectures = ['北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県', '茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県', '新潟県', '富山県', '石川県', '福井県', '山梨県', '長野県', '岐阜県', '静岡県', '愛知県', '三重県', '滋賀県', '京都府', '大阪府', '兵庫県', '奈良県', '和歌山県', '鳥取県', '島根県', '岡山県', '広島県', '山口県', '徳島県', '香川県', '愛媛県', '高知県', '福岡県', '佐賀県', '長崎県', '熊本県', '大分県', '宮崎県', '鹿児島県', '沖縄県'];
-const roomUsages = [
-  '保育室',
-  '休憩室',
-  '多目的室',
-  '図書室',
-  '音楽室',
-  '乳児室',
-  'ほふく室',
-  '遊戯室（ホール）',
-  '調理室',
-  '職員室',
-  'その他',
+const roomUsages = ['保育室','休憩室','多目的室','図書室','音楽室','乳児室','ほふく室','遊戯室（ホール）','調理室','職員室','その他',];
+const checklistItems = [
+  '室内に人がいない状態にしました(測定者のみ)。',
+  '窓・ドア・カーテンを普段の状態にしました。',
+  'エアコン・換気扇・空気清浄機など、音の出る機器を止めました。',
+  '端末の音量を最大にし、通知音が鳴らないようにしました。',
+  '屋外や隣の部屋から大きな音が聞こえない状態です。',
+  '測定中は動かず、物音を立てないことを理解しました。',
 ];
 
 export default function App() {
   const [page, setPage] = useState(1);
   const [prevPage, setPrevPage] = useState(1); // 直前のページ一時記録
   const [form, setForm] = useState({ name: '', pref: '', city: '', kids: '', usage: '', l: 0, w: 0, h: 0 });
+  const [checklist, setChecklist] = useState(() => checklistItems.map(() => false));
 
   const V = form.l * form.w * form.h; // 室容積
   const dc = 0.057 * Math.sqrt(V / 0.5); // 直接音距離
@@ -29,7 +26,8 @@ export default function App() {
   const numPoints = getPoints(V);
 
   // 必須入力チェック
-  const isNextDisabled = page === 3 && (!form.name || form.l <= 0 || form.w <= 0 || form.h <= 0);
+  const isP3NextDisabled = page === 3 && (!form.name || form.l <= 0 || form.w <= 0 || form.h <= 0);
+  const isNextDisabled = isP3NextDisabled || (page === 4 && checklist.some((checked) => !checked));
 
   // 間取り図スケーリング
   const maxDim = Math.max(form.l, form.w) || 1;
@@ -129,7 +127,7 @@ export default function App() {
 
       {/* P1: ホーム画面 */}
       {page === 1 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '12px', minHeight: 'calc(100svh - 96px)', textAlign: 'center' }}>
           <h1>保育士向け残響測定</h1>
           <button style={{ width: '100%', boxSizing: 'border-box', padding: '20px', fontSize: '18px' }} onClick={() => setPage(2)}>🔊 測定を始める</button>
           <button style={{ width: '100%', boxSizing: 'border-box', padding: '20px', fontSize: '18px' }} onClick={() => alert('今までの結果（実装予定）')}>📁 今までの結果</button>
@@ -204,7 +202,7 @@ export default function App() {
             </label>
           </div>
 
-          {isNextDisabled && <p style={{ color: '#b91c1c', fontSize: '13px', textAlign: 'left' }}>※「施設名」「奥行」「幅」「高さ」をすべて入力すると「次へ」に進めます。</p>}
+          {isP3NextDisabled && <p style={{ color: '#b91c1c', fontSize: '13px', textAlign: 'left' }}>※「施設名」「奥行」「幅」「高さ」をすべて入力すると「次へ」に進めます。</p>}
 
           {/* 簡易間取り図 */}
           {form.l > 0 && form.w > 0 && (
@@ -233,9 +231,21 @@ export default function App() {
       {page === 4 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <h2>測定前チェックリスト</h2>
-          <ul style={{ margin: '0', paddingLeft: '20px' }}>
-            <li>窓やドアは全て閉まっていますか？</li>
-            <li>部屋の中は静かですか？</li>
+          <p style={{ textAlign: 'left' }}>正確に測定するため、すべての項目を確認してチェックを入れてください。</p>
+          <ul style={{ display: 'flex', flexDirection: 'column', gap: '12px', margin: '0', padding: '0', listStyle: 'none' }}>
+            {checklistItems.map((item, index) => (
+              <li key={item}>
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', color: '#111827', fontSize: '16px', lineHeight: '1.5', textAlign: 'left', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={checklist[index]}
+                    onChange={(event) => setChecklist((current) => current.map((checked, itemIndex) => itemIndex === index ? event.target.checked : checked))}
+                    style={{ width: '20px', height: '20px', flexShrink: '0', margin: '2px 0 0' }}
+                  />
+                  <span>{item}</span>
+                </label>
+              </li>
+            ))}
           </ul>
         </div>
       )}
