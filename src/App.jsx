@@ -14,29 +14,14 @@ const checklistItems = [
   '測定中は動かず、物音を立てないことを理解しました。',
 ];
 
-const getTimestamp = () => new Date().toISOString();
-const prefectures = ['北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県', '茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県', '新潟県', '富山県', '石川県', '福井県', '山梨県', '長野県', '岐阜県', '静岡県', '愛知県', '三重県', '滋賀県', '京都府', '大阪府', '兵庫県', '奈良県', '和歌山県', '鳥取県', '島根県', '岡山県', '広島県', '山口県', '徳島県', '香川県', '愛媛県', '高知県', '福岡県', '佐賀県', '長崎県', '熊本県', '大分県', '宮崎県', '鹿児島県', '沖縄県'];
-const roomUsages = ['保育室','休憩室','多目的室','図書室','音楽室','乳児室','ほふく室','遊戯室（ホール）','調理室','職員室','その他',];
-const checklistItems = [
-  '室内に人がいない状態にしました(測定者のみ)。',
-  '窓・ドア・カーテンを普段の状態にしました。',
-  'エアコン・換気扇・空気清浄機など、音の出る機器を止めました。',
-  '端末の音量を最大にし、通知音が鳴らないようにしました。',
-  '屋外や隣の部屋から大きな音が聞こえない状態です。',
-  '測定中は動かず、物音を立てないことを理解しました。',
-];
-
 export default function App() {
   const [page, setPage] = useState(1);
   const [prevPage, setPrevPage] = useState(1); // 直前のページ一時記録
   const [form, setForm] = useState({ name: '', pref: '', city: '', kids: '', usage: '', l: 0, w: 0, h: 0 });
   const [checklist, setChecklist] = useState(() => checklistItems.map(() => false));
-<<<<<<< HEAD
   const [savedResults, setSavedResults] = useState([]);
   const [resultsLoading, setResultsLoading] = useState(false);
   const [resultsError, setResultsError] = useState('');
-=======
->>>>>>> 129d005b8a5fe43b7b711c0127a834e0c184cb14
 
   const V = form.l * form.w * form.h; // 室容積
   const dc = 0.057 * Math.sqrt(V / 0.5); // 直接音距離
@@ -46,14 +31,6 @@ export default function App() {
   // 必須入力チェック
   const isP3NextDisabled = page === 3 && (!form.name || form.l <= 0 || form.w <= 0 || form.h <= 0);
   const isNextDisabled = isP3NextDisabled || (page === 4 && checklist.some((checked) => !checked));
-
-  // 間取り図スケーリング
-  const maxDim = Math.max(form.l, form.w) || 1;
-  const scale = 160 / maxDim;
-  const svgW = form.w * scale;
-  const svgL = form.l * scale;
-  const rectX = 100 - svgW / 2;
-  const rectY = 100 - svgL / 2;
 
   const planScale = 210 / Math.max(form.l, form.w || 1);
   const planWidth = form.w > 0 ? form.w * planScale : 0;
@@ -78,7 +55,6 @@ export default function App() {
     w: 7,
     h: 3,
   }));
-<<<<<<< HEAD
   const handleRetrySamePlace = () => {
     setChecklist(checklistItems.map(() => false));
     setPage(4);
@@ -109,8 +85,6 @@ export default function App() {
       setResultsLoading(false);
     }
   };
-=======
->>>>>>> 129d005b8a5fe43b7b711c0127a834e0c184cb14
 
   const handleUpload = async () => {
     if (!db) {
@@ -195,11 +169,7 @@ export default function App() {
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '12px', minHeight: 'calc(100svh - 96px)', textAlign: 'center' }}>
           <h1>保育士向け残響測定</h1>
           <button style={{ width: '100%', boxSizing: 'border-box', padding: '20px', fontSize: '18px' }} onClick={() => setPage(2)}>🔊 測定を始める</button>
-<<<<<<< HEAD
           <button style={{ width: '100%', boxSizing: 'border-box', padding: '20px', fontSize: '18px' }} onClick={handleShowSavedResults}>📁 今までの結果</button>
-=======
-          <button style={{ width: '100%', boxSizing: 'border-box', padding: '20px', fontSize: '18px' }} onClick={() => alert('今までの結果（実装予定）')}>📁 今までの結果</button>
->>>>>>> 129d005b8a5fe43b7b711c0127a834e0c184cb14
         </div>
       )}
 
@@ -410,15 +380,9 @@ export default function App() {
       )}
 
       {/* ナビゲーションボタン */}
-<<<<<<< HEAD
       {page > 1 && page !== 0 && page !== 7 && (
         <div style={{ display: 'grid', gridTemplateColumns: page < 7 ? 'repeat(2, minmax(0, 1fr))' : '1fr', gap: '12px', marginTop: page === 3 ? '40px' : '16px' }}>
           <button style={{ width: '100%', boxSizing: 'border-box', padding: '10px 20px', fontSize: '16px' }} onClick={() => setPage(page === 8 ? 1 : page - 1)}>{page === 8 ? '🏠 ホームに戻る' : '◀ 戻る'}</button>
-=======
-      {page > 1 && page !== 0 && (
-        <div style={{ display: 'grid', gridTemplateColumns: page < 7 ? 'repeat(2, minmax(0, 1fr))' : '1fr', gap: '12px', marginTop: page === 3 ? '40px' : '16px' }}>
-          <button style={{ width: '100%', boxSizing: 'border-box', padding: '10px 20px', fontSize: '16px' }} onClick={() => setPage(page - 1)}>◀ 戻る</button>
->>>>>>> 129d005b8a5fe43b7b711c0127a834e0c184cb14
           {page < 7 && (
             <button 
               style={{ width: '100%', boxSizing: 'border-box', padding: '10px 20px', fontSize: '16px' }} 
